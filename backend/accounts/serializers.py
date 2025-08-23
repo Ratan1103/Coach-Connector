@@ -9,12 +9,67 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CoachRegisterSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(write_only=True)
+    name = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, min_length=6)
+    phone = serializers.CharField()
+    experience = serializers.IntegerField()
+    sport = serializers.CharField()
+    photo = serializers.ImageField(required=False)
+
     class Meta:
         model = CoachProfile
-        fields = ["phone", "experience", "sport", "photo"]
+        fields = ["email", "name", "password", "phone", "experience", "sport", "photo"]
 
+    def create(self, validated_data):
+        email = validated_data.pop("email")
+        name = validated_data.pop("name")
+        password = validated_data.pop("password")
+
+        user = User.objects.create_user(
+            email=email,
+            name=name,
+            password=password,
+            is_coach=True
+        )
+
+        coach_profile = CoachProfile.objects.create(user=user, **validated_data)
+        return coach_profile
 
 class AthleteRegisterSerializer(serializers.ModelSerializer):
+    # extra fields for AthleteProfile
+    phone = serializers.CharField()
+    age = serializers.IntegerField()
+    sport = serializers.CharField()
+    location = serializers.CharField()
+
+    password = serializers.CharField(write_only=True)
+
     class Meta:
-        model = AthleteProfile
-        fields = ["phone", "age", "sport", "location"]
+        model = User
+        fields = ["email", "name", "password", "phone", "age", "sport", "location"]
+
+    def create(self, validated_data):
+        phone = validated_data.pop("phone")
+        age = validated_data.pop("age")
+        sport = validated_data.pop("sport")
+        location = validated_data.pop("location")
+
+        # Create User with is_athlete=True
+        user = User.objects.create_user(
+            email=validated_data["email"],
+            password=validated_data["password"],
+            name=validated_data["name"],
+            is_athlete=True
+        )
+
+        # Create AthleteProfile
+        AthleteProfile.objects.create(
+            user=user,
+            phone=phone,
+            age=age,
+            sport=sport,
+            location=location
+        )
+
+        return user
