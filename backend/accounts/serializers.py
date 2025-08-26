@@ -73,3 +73,28 @@ class AthleteRegisterSerializer(serializers.ModelSerializer):
         )
 
         return user
+    
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "email", "name", "is_coach", "is_athlete"]
+
+
+# ---------------------------
+# Coach Profile serializer
+# ---------------------------
+class CoachProfileSerializer(serializers.ModelSerializer):
+    # Nested user details
+    user = UserSerializer()
+
+    class Meta:
+        model = CoachProfile
+        fields = ["id", "user", "phone", "experience", "sport"]
+
+class AthleteProfileSerializer(serializers.ModelSerializer):
+    # Nested user details
+    user = UserSerializer()
+
+    class Meta:
+        model = AthleteProfile
+        fields = ["id", "user", "phone", "age", "sport", "location"]

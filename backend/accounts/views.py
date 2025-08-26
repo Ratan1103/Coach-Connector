@@ -1,11 +1,15 @@
 from rest_framework import generics,permissions
 from rest_framework.response import Response
-
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import User, CoachProfile, AthleteProfile
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import UserSerializer, CoachRegisterSerializer, AthleteRegisterSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status
+from .serializers import AthleteProfileSerializer, CoachProfileSerializer
+
 
 class RegisterCoachView(generics.CreateAPIView):
     permission_classes = [AllowAny]
@@ -63,3 +67,23 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def athlete_profile(request):
+    try:
+        athlete = AthleteProfile.objects.get(user=request.user)
+        serializer = AthleteProfileSerializer(athlete)
+        return Response(serializer.data)
+    except AthleteProfile.DoesNotExist:
+        return Response({"error": "Athlete profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def coach_profile(request):
+    try:
+        coach = CoachProfile.objects.get(user=request.user)
+        serializer = CoachProfileSerializer(coach)
+        return Response(serializer.data)
+    except CoachProfile.DoesNotExist:
+        return Response({"error": "Coach profile not found"}, status=status.HTTP_404_NOT_FOUND)
