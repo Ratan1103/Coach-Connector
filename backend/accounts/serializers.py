@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, CoachProfile, AthleteProfile
+from .models import User, CoachProfile, AthleteProfile, CoachingRequest
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -98,3 +98,16 @@ class AthleteProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = AthleteProfile
         fields = ["id", "user", "phone", "age", "sport", "location"]
+
+class CoachingRequestSerializer(serializers.ModelSerializer):
+    athlete = AthleteProfileSerializer(read_only=True)
+    class Meta:
+        model = CoachingRequest
+        fields = ['id', 'athlete', 'coach', 'status', 'created_at']
+        read_only_fields = ['athlete', 'status', 'created_at']
+
+    def get_status(self, obj):
+        """Return status in lowercase for consistency."""
+        if obj.status:
+            return obj.status.lower()
+        return None

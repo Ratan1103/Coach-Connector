@@ -31,8 +31,6 @@ const Login = () => {
         navigate("/dashboard/coach");
       } else if (res.data.role === "athlete") {
         navigate("/dashboard/athlete");
-      } else {
-        navigate("/dashboard"); // fallback
       }
     } catch (err) {
       console.error("❌ Error:", err.response?.data);
@@ -90,7 +88,7 @@ const Login = () => {
 
         <p className="mt-4 text-center text-gray-600">
           Don’t have an account?{" "}
-          <a href="/register/athlete" className="text-indigo-600 hover:underline">
+          <a href="/" className="text-indigo-600 hover:underline">
             Register here
           </a>
         </p>

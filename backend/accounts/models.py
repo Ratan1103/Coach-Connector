@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.conf import settings
 
 
 class UserManager(BaseUserManager):
@@ -49,3 +50,18 @@ class AthleteProfile(models.Model):
     age = models.IntegerField()
     sport = models.CharField(max_length=50)
     location = models.CharField(max_length=100)
+
+class CoachingRequest(models.Model):
+    STATUS_CHOICES = [
+        ('requested', 'Requested'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    athlete = models.ForeignKey('AthleteProfile', related_name='requests', on_delete=models.CASCADE)
+    coach = models.ForeignKey('CoachProfile', related_name='coach_requests', on_delete=models.CASCADE)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='requested')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.athlete.user.email} → {self.coach.user.email} ({self.status})"
