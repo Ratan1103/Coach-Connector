@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -144,6 +146,14 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),   # Access token valid for 60 mins
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),     # Refresh token valid for 30 days
+    "ROTATE_REFRESH_TOKENS": False,                   # Keep refresh token same
+    "BLACKLIST_AFTER_ROTATION": True,                 # Blacklist old tokens if rotated
+    "UPDATE_LAST_LOGIN": True,                        # Update last login time
+}
 
 # settings.py
 
